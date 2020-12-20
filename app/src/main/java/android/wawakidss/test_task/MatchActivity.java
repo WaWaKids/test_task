@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
@@ -24,6 +25,9 @@ public class MatchActivity extends AppCompatActivity {
     private static final String MATCH_URL = "http://api.instat.tv/test/data";
     private static final String VIDEOS_URL = "https://api.instat.tv/test/video-urls";
     private TextView text;
+    public static final MediaType JSON
+            = MediaType.get("application/json; charset=utf-8");
+    OkHttpClient client = new OkHttpClient();
 
 
     @Override
@@ -48,63 +52,27 @@ public class MatchActivity extends AppCompatActivity {
 
         Log.d(TAG, jsonMatchParams.toString());
 
-        JSONObject jsonObject = new JSONObject();
+        final JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("proc", "get_match_info");
-            jsonObject.put("params", jsonMatchParams.toString());
+            jsonObject.put("params", jsonMatchParams);
             Log.d(TAG, "jsonObject: " + jsonObject.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
-        JSONObject match_response = foo(MATCH_URL, jsonObject);
-        Log.d(TAG, "response: " + match_response.toString());
-
+        String matchResponse = post(MATCH_URL, jsonObject.toString());
+        Log.d(TAG, "response: " + matchResponse);
     }
 
-    public static JSONObject foo(String url, JSONObject json) {
-        JSONObject jsonObjectResp = null;
-
-        try {
-
-            MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-            OkHttpClient client = new OkHttpClient();
-
-            okhttp3.RequestBody body = RequestBody.create(JSON, json.toString());
-            okhttp3.Request request = new okhttp3.Request.Builder()
-                    .url(url)
-                    .post(body)
-                    .build();
-
-            okhttp3.Response response = client.newCall(request).execute();
-
-            String networkResp = response.body().string();
-            if (!networkResp.isEmpty()) {
-                jsonObjectResp = parseJSONStringToJSONObject(networkResp);
-            }
-        } catch (Exception ex) {
-            String err = String.format("{\"result\":\"false\",\"error\":\"%s\"}", ex.getMessage());
-            jsonObjectResp = parseJSONStringToJSONObject(err);
+    String post(String url, String json) throws IOException {
+        RequestBody body = RequestBody.create(json, JSON);
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        try (Response response = client.newCall(request).execute()) {
+            return response.body().string();
         }
-
-        return jsonObjectResp;
-    }
-
-    private static JSONObject parseJSONStringToJSONObject(final String strr) {
-
-        JSONObject response = null;
-        try {
-            response = new JSONObject(strr);
-        } catch (Exception ex) {
-            //  Log.e("Could not parse malformed JSON: \"" + json + "\"");
-            try {
-                response = new JSONObject();
-                response.put("result", "failed");
-                response.put("data", strr);
-                response.put("error", ex.getMessage());
-            } catch (Exception exx) {
-            }
-        }
-        return response;
     }
 }
