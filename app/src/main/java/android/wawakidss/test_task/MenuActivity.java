@@ -30,9 +30,9 @@ public class MenuActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MenuActivity.this, MatchActivity.class);
-                intent.putExtra("_p_sport", sportId.getText().toString());
+                intent.putExtra("_p_sport", Integer.parseInt(sportId.getText().toString()));
                 Log.d(TAG, sportId.getText().toString() + " put in intent as sport _p_sport");
-                intent.putExtra("_p_match_id", matchId.getText().toString());
+                intent.putExtra("_p_match_id", Integer.parseInt(matchId.getText().toString()));
                 Log.d(TAG, matchId.getText().toString() + " put in intent as sport _p_match_id");
                 startActivity(intent);
             }
