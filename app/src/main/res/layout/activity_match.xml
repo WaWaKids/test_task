@@ -1,9 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MatchActivity">
+
+    <TextView
+        android:id="@+id/tournament_name_eng"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="tournament_name"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/tournament_name_rus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="30dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="название турнира"
+        app:layout_constraintTop_toBottomOf="@+id/tournament_name_eng"/>
+
+    <TextView
+        android:id="@+id/team1_name_eng"
+        android:layout_width="180dp"
+        android:layout_height="100dp"
+        android:text="team1_name_eng"
+        android:textSize="20dp"
+        android:gravity="center_horizontal|center_vertical"
+        app:layout_constraintTop_toBottomOf="@+id/tournament_name_rus"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <TextView
+        android:id="@+id/team1_name_rus"
+        android:layout_width="180dp"
+        android:layout_height="100dp"
+        android:text="team1_name_rus"
+        android:textSize="20dp"
+        android:gravity="center_horizontal|center_vertical"
+        app:layout_constraintTop_toBottomOf="@+id/team1_name_eng"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+
+    <TextView
+        android:id="@+id/team2_name_eng"
+        android:layout_width="180dp"
+        android:layout_height="100dp"
+        android:text="team2_name_eng"
+        android:textSize="20dp"
+        android:gravity="center_horizontal|center_vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tournament_name_rus" />
+
+    <TextView
+        android:id="@+id/team2_name_rus"
+        android:layout_width="180dp"
+        android:layout_height="100dp"
+        android:text="team2_name_rus"
+        android:textSize="20dp"
+        android:gravity="center_horizontal|center_vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/team2_name_eng" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="vs"
+        android:textSize="30dp"
+        app:layout_constraintBottom_toBottomOf="@+id/team1_name_eng"
+        app:layout_constraintEnd_toStartOf="@+id/team2_name_eng"
+        app:layout_constraintStart_toEndOf="@+id/team1_name_eng" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="счет"
+        android:textSize="30dp"
+        app:layout_constraintEnd_toEndOf="@+id/team1_name_rus"
+        app:layout_constraintStart_toStartOf="@+id/team1_name_rus"
+        app:layout_constraintTop_toBottomOf="@+id/team1_name_rus" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="счет"
+        android:textSize="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/team2_name_rus"
+        app:layout_constraintTop_toBottomOf="@+id/team2_name_rus" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
