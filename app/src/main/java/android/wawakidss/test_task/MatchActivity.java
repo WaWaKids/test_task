@@ -61,11 +61,12 @@ public class MatchActivity extends AppCompatActivity {
 
         videoRequest = new VideoRequest(matchId, sport);
         Log.d(TAG, "videoRequest: " + gson.toJson(videoRequest));
-        sendVideoPost(videoRequest);
+        sendVideoPost(sport, matchId);
     }
 
     public void sendMatchPost(MatchRequest matchRequest) {
-        apiInterface.getMatchData(matchRequest).enqueue(new Callback<MatchResponse>() {
+        Call<MatchResponse> matchResponseCall = apiInterface.getMatchData(matchRequest);
+        matchResponseCall.enqueue(new Callback<MatchResponse>() {
             @Override
             public void onResponse(Call<MatchResponse> call, Response<MatchResponse> response) {
                 if (response.isSuccessful()) {
@@ -80,8 +81,8 @@ public class MatchActivity extends AppCompatActivity {
         });
     }
 
-    public void sendVideoPost(VideoRequest videoRequest) {
-        apiInterface.getVideos(videoRequest).enqueue(new Callback<List<VideoResponse>>() {
+    public void sendVideoPost(int matchId, int sportId) {
+        apiInterface.getVideos(matchId, sportId).enqueue(new Callback<List<VideoResponse>>() {
             @Override
             public void onResponse(Call<List<VideoResponse>> call, Response<List<VideoResponse>> response) {
                 if (response.isSuccessful()) {
