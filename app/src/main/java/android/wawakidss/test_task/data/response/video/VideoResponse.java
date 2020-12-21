@@ -1,4 +1,4 @@
-package android.wawakidss.test_task.data;
+package android.wawakidss.test_task.data.response.video;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -6,9 +6,11 @@ import com.google.gson.annotations.SerializedName;
 import javax.xml.namespace.QName;
 
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
-public class Video {
+@Setter
+public class VideoResponse {
 
     @SerializedName("name")
     @Expose
