@@ -2,19 +2,17 @@ package android.wawakidss.test_task;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.wawakidss.test_task.data.request.tournament.MatchParams;
-import android.wawakidss.test_task.data.request.tournament.MatchRequest;
-import android.wawakidss.test_task.data.request.video.VideoRequest;
-import android.wawakidss.test_task.data.response.tournament.MatchResponse;
-import android.wawakidss.test_task.data.response.video.VideoResponse;
+import android.wawakidss.test_task.data.MatchRequest;
+import android.wawakidss.test_task.data.VideoRequest;
+import android.wawakidss.test_task.data.MatchResponse;
+import android.wawakidss.test_task.data.VideoResponse;
 import android.wawakidss.test_task.retrofit.InstatAPI;
 import android.wawakidss.test_task.retrofit.RetrofitClient;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.Gson;
 
 import java.util.List;
 
@@ -28,8 +26,17 @@ public class MatchActivity extends AppCompatActivity {
     private static final String MATCH_URL = "http://api.instat.tv/test/data";
     private static final String VIDEOS_URL = "https://api.instat.tv/test/video-urls";
     private InstatAPI apiInterface = RetrofitClient.getClient().create(InstatAPI.class);
-    private TextView text;
-
+    Gson gson = new Gson();
+    private TextView tournamentNameEng;
+    private TextView tournamentNameRus;
+    private TextView team1NameEng;
+    private TextView team1NameRus;
+    private TextView team2NameEng;
+    private TextView team2NameRus;
+    private TextView score1;
+    private TextView score2;
+    private MatchRequest matchRequest;
+    private VideoRequest videoRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,11 +47,21 @@ public class MatchActivity extends AppCompatActivity {
         int sport = args.getInt("_p_sport");
         int matchId = args.getInt("_p_match_id");
 
-        MatchRequest matchRequest = new MatchRequest("get_match_info", sport, matchId);
+        tournamentNameEng = (TextView)findViewById(R.id.tournament_name_eng);
+        tournamentNameRus = (TextView)findViewById(R.id.tournament_name_rus);
 
-        Call<MatchResponse> matchResponseCall = apiInterface.getMatchData(matchRequest);
+        team1NameEng = (TextView)findViewById(R.id.team1_name_eng);
+        team1NameRus = (TextView)findViewById(R.id.team1_name_rus);
+        team2NameEng = (TextView)findViewById(R.id.team2_name_eng);
+        team2NameRus = (TextView)findViewById(R.id.team1_name_rus);
+
+        matchRequest = new MatchRequest("get_match_info", sport, matchId);
+        Log.d(TAG, "matchRequest: " + gson.toJson(matchRequest));
         sendMatchPost(matchRequest);
-        VideoRequest videoRequest = new VideoRequest(matchId, sport);
+
+        videoRequest = new VideoRequest(matchId, sport);
+        Log.d(TAG, "videoRequest: " + gson.toJson(videoRequest));
+        sendVideoPost(videoRequest);
     }
 
     public void sendMatchPost(MatchRequest matchRequest) {

@@ -1,4 +1,4 @@
-package android.wawakidss.test_task.data.response.tournament;
+package android.wawakidss.test_task.data;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
