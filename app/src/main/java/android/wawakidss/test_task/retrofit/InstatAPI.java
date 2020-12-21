@@ -9,6 +9,7 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 
@@ -20,5 +21,6 @@ public interface InstatAPI {
 
     @POST("test/videoResponse-urls")
     @Headers({ "Content-Type: application/json"})
-    Call<List<VideoResponse>> getVideos(@Body VideoRequest videoRequest);
+    Call<List<VideoResponse>> getVideos(@Field("match_id") int matchId,
+                                        @Field("sport_id") int sportId);
 }
