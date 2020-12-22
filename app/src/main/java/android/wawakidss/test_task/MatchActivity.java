@@ -1,19 +1,27 @@
 package android.wawakidss.test_task;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.security.NetworkSecurityPolicy;
 import android.util.Log;
+import android.view.View;
 import android.wawakidss.test_task.data.MatchRequest;
-import android.wawakidss.test_task.data.VideoRequest;
 import android.wawakidss.test_task.data.MatchResponse;
-import android.wawakidss.test_task.data.VideoResponse;
+import android.wawakidss.test_task.data.VideosRequest;
+import android.wawakidss.test_task.data.VideosResponse;
 import android.wawakidss.test_task.retrofit.InstatAPI;
 import android.wawakidss.test_task.retrofit.RetrofitClient;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -36,7 +44,7 @@ public class MatchActivity extends AppCompatActivity {
     private TextView score1;
     private TextView score2;
     private MatchRequest matchRequest;
-    private VideoRequest videoRequest;
+    private VideosRequest videosRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +54,13 @@ public class MatchActivity extends AppCompatActivity {
         Bundle args = getIntent().getExtras();
         int sport = args.getInt("_p_sport");
         int matchId = args.getInt("_p_match_id");
+
+        if (NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted()) {
+            Log.d(TAG, "internet connection is denied");
+            Toast.makeText(MatchActivity.this,
+                    "Internet connection is denied by Network Security Policy",
+                    Toast.LENGTH_SHORT);
+        }
 
         tournamentNameEng = (TextView)findViewById(R.id.tournament_name_eng);
         tournamentNameRus = (TextView)findViewById(R.id.tournament_name_rus);
@@ -59,9 +74,9 @@ public class MatchActivity extends AppCompatActivity {
         Log.d(TAG, "matchRequest: " + gson.toJson(matchRequest));
         sendMatchPost(matchRequest);
 
-        videoRequest = new VideoRequest(matchId, sport);
-        Log.d(TAG, "videoRequest: " + gson.toJson(videoRequest));
-        sendVideoPost(sport, matchId);
+        videosRequest = new VideosRequest(matchId, sport);
+        Log.d(TAG, "videoRequest: " + gson.toJson(videosRequest));
+        sendVideoPost(videosRequest);
     }
 
     public void sendMatchPost(MatchRequest matchRequest) {
@@ -71,6 +86,7 @@ public class MatchActivity extends AppCompatActivity {
             public void onResponse(Call<MatchResponse> call, Response<MatchResponse> response) {
                 if (response.isSuccessful()) {
                     Log.d(TAG, "post submitted to API." + response.body().toString());
+                    setMatchInfoOnScreen(response.body());
                 }
             }
 
@@ -81,19 +97,52 @@ public class MatchActivity extends AppCompatActivity {
         });
     }
 
-    public void sendVideoPost(int matchId, int sportId) {
-        apiInterface.getVideos(matchId, sportId).enqueue(new Callback<List<VideoResponse>>() {
+    public void sendVideoPost(VideosRequest videosRequest) {
+        apiInterface.getVideos(videosRequest).enqueue(new Callback<List<VideosResponse>>() {
             @Override
-            public void onResponse(Call<List<VideoResponse>> call, Response<List<VideoResponse>> response) {
+            public void onResponse(Call<List<VideosResponse>> call, Response<List<VideosResponse>> response) {
                 if (response.isSuccessful()) {
                     Log.d(TAG, "post submitted to API." + response.body());
+                    setVideoButtonsOnScreen(response);
                 }
             }
 
             @Override
-            public void onFailure(Call<List<VideoResponse>> call, Throwable t) {
+            public void onFailure(Call<List<VideosResponse>> call, Throwable t) {
                 Log.d(TAG, "Unable to submit video post to API");
             }
         });
+    }
+
+    private void setMatchInfoOnScreen(MatchResponse matchResponse) {
+        tournamentNameEng.setText(matchResponse.getTournament().getNameEng());
+        tournamentNameRus.setText(matchResponse.getTournament().getNameRus());
+        team1NameEng.setText(matchResponse.getTeam1().getNameEng());
+        team1NameRus.setText(matchResponse.getTeam1().getNameRus());
+        team2NameEng.setText(matchResponse.getTeam2().getNameEng());
+        team2NameRus.setText(matchResponse.getTeam2().getNameRus());
+        score1.setText(matchResponse.getTeam1().getScore());
+        score2.setText(matchResponse.getTeam2().getScore());
+    }
+
+    private void setVideoButtonsOnScreen(List<VideosResponse> videosList) {
+        LinearLayout ll = (LinearLayout)findViewById(R.id.layout_buttons);
+        videosList = (ArrayList<VideosResponse>)videosList;
+
+        for(int i = 0; i < videosList.size(); i++) {
+            Button videoButton = new Button(this);
+            videoButton.setText(videosList.get(i).getName());
+
+            videoButton.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
+            videoButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(videosList.get(i).getURL())));
+                    Log.i("Video", "Video Playing....");
+                }
+            });
+
+            ll.addView(videoButton);
+        }
     }
 }
