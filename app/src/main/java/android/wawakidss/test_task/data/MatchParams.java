@@ -23,4 +23,20 @@ public class MatchParams {
         this.sportId = sportId;
         this.matchId = matchId;
     }
+
+    public int getSportId() {
+        return sportId;
+    }
+
+    public void setSportId(int sportId) {
+        this.sportId = sportId;
+    }
+
+    public int getMatchId() {
+        return matchId;
+    }
+
+    public void setMatchId(int matchId) {
+        this.matchId = matchId;
+    }
 }

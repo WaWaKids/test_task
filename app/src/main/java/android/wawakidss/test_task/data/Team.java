@@ -3,13 +3,6 @@ package android.wawakidss.test_task.data;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
-@AllArgsConstructor
 public class Team {
 
     @SerializedName("id")
@@ -57,6 +50,13 @@ public class Team {
     }
 
     public void setScore(int score) {
+        this.score = score;
+    }
+
+    public Team(int id, String nameEng, String nameRus, int score) {
+        this.id = id;
+        this.nameEng = nameEng;
+        this.nameRus = nameRus;
         this.score = score;
     }
 }
