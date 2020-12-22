@@ -102,7 +102,7 @@ public class MatchActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<VideosResponse>> call, Response<List<VideosResponse>> response) {
                 if (response.isSuccessful()) {
-                    Log.d(TAG, "post submitted to API." + response.body());
+                    Log.d(TAG, "post submitted to API." + gson.toJson(response.body()));
                     setVideoButtonsOnScreen(response);
                 }
             }
