@@ -94,4 +94,12 @@
         app:layout_constraintStart_toStartOf="@+id/team2_name_rus"
         app:layout_constraintTop_toBottomOf="@+id/team2_name_rus" />
 
+    <LinearLayout
+        android:id="@+id/layout_buttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/score1"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
