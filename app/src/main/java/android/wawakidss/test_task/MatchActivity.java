@@ -1,11 +1,8 @@
 package android.wawakidss.test_task;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.security.NetworkSecurityPolicy;
 import android.util.Log;
-import android.view.View;
 import android.wawakidss.test_task.data.MatchRequest;
 import android.wawakidss.test_task.data.MatchResponse;
 import android.wawakidss.test_task.data.VideosRequest;
@@ -31,8 +28,6 @@ import retrofit2.Response;
 public class MatchActivity extends AppCompatActivity {
 
     private static final String TAG = "MatchActivity";
-    private static final String MATCH_URL = "http://api.instat.tv/test/data";
-    private static final String VIDEOS_URL = "https://api.instat.tv/test/video-urls";
     private InstatAPI apiInterface = RetrofitClient.getClient().create(InstatAPI.class);
     Gson gson = new Gson();
     private TextView tournamentNameEng;
@@ -67,8 +62,12 @@ public class MatchActivity extends AppCompatActivity {
 
         team1NameEng = (TextView)findViewById(R.id.team1_name_eng);
         team1NameRus = (TextView)findViewById(R.id.team1_name_rus);
+
         team2NameEng = (TextView)findViewById(R.id.team2_name_eng);
-        team2NameRus = (TextView)findViewById(R.id.team1_name_rus);
+        team2NameRus = (TextView)findViewById(R.id.team2_name_rus);
+
+        score1 = (TextView)findViewById(R.id.score1);
+        score2 = (TextView)findViewById(R.id.score2);
 
         matchRequest = new MatchRequest("get_match_info", sport, matchId);
         Log.d(TAG, "matchRequest: " + gson.toJson(matchRequest));
@@ -117,30 +116,28 @@ public class MatchActivity extends AppCompatActivity {
     private void setMatchInfoOnScreen(MatchResponse matchResponse) {
         tournamentNameEng.setText(matchResponse.getTournament().getNameEng());
         tournamentNameRus.setText(matchResponse.getTournament().getNameRus());
+
         team1NameEng.setText(matchResponse.getTeam1().getNameEng());
         team1NameRus.setText(matchResponse.getTeam1().getNameRus());
+
         team2NameEng.setText(matchResponse.getTeam2().getNameEng());
         team2NameRus.setText(matchResponse.getTeam2().getNameRus());
-        score1.setText(matchResponse.getTeam1().getScore());
-        score2.setText(matchResponse.getTeam2().getScore());
+
+        score1.setText(Integer.toString(matchResponse.getTeam1().getScore()));
+        score2.setText(Integer.toString(matchResponse.getTeam2().getScore()));
     }
 
-    private void setVideoButtonsOnScreen(List<VideosResponse> videosList) {
+    private void setVideoButtonsOnScreen(List<VideosResponse> videos) {
+        ArrayList<VideosResponse> videosList = (ArrayList<VideosResponse>)videos;
         LinearLayout ll = (LinearLayout)findViewById(R.id.layout_buttons);
-        videosList = (ArrayList<VideosResponse>)videosList;
 
         for(int i = 0; i < videosList.size(); i++) {
             Button videoButton = new Button(this);
             videoButton.setText(videosList.get(i).getName());
 
-            videoButton.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
-            videoButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(videosList.get(i).getURL())));
-                    Log.i("Video", "Video Playing....");
-                }
-            });
+            videoButton.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT));
 
             ll.addView(videoButton);
         }
