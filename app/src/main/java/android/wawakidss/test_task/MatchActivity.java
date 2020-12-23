@@ -1,8 +1,11 @@
 package android.wawakidss.test_task;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.security.NetworkSecurityPolicy;
 import android.util.Log;
+import android.view.View;
 import android.wawakidss.test_task.data.MatchRequest;
 import android.wawakidss.test_task.data.MatchResponse;
 import android.wawakidss.test_task.data.VideosRequest;
@@ -40,6 +43,7 @@ public class MatchActivity extends AppCompatActivity {
     private TextView score2;
     private MatchRequest matchRequest;
     private VideosRequest videosRequest;
+    private LinearLayout ll;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +54,7 @@ public class MatchActivity extends AppCompatActivity {
         int sport = args.getInt("_p_sport");
         int matchId = args.getInt("_p_match_id");
 
-        if (NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted()) {
-            Log.d(TAG, "internet connection is denied");
-            Toast.makeText(MatchActivity.this,
-                    "Internet connection is denied by Network Security Policy",
-                    Toast.LENGTH_SHORT);
-        }
+        ll = (LinearLayout)findViewById(R.id.layout_buttons);
 
         tournamentNameEng = (TextView)findViewById(R.id.tournament_name_eng);
         tournamentNameRus = (TextView)findViewById(R.id.tournament_name_rus);
@@ -69,6 +68,8 @@ public class MatchActivity extends AppCompatActivity {
         score1 = (TextView)findViewById(R.id.score1);
         score2 = (TextView)findViewById(R.id.score2);
 
+        ll = (LinearLayout)findViewById(R.id.layout_buttons);
+
         matchRequest = new MatchRequest("get_match_info", sport, matchId);
         Log.d(TAG, "matchRequest: " + gson.toJson(matchRequest));
         sendMatchPost(matchRequest);
@@ -79,12 +80,11 @@ public class MatchActivity extends AppCompatActivity {
     }
 
     public void sendMatchPost(MatchRequest matchRequest) {
-        Call<MatchResponse> matchResponseCall = apiInterface.getMatchData(matchRequest);
-        matchResponseCall.enqueue(new Callback<MatchResponse>() {
+        apiInterface.getMatchData(matchRequest).enqueue(new Callback<MatchResponse>() {
             @Override
             public void onResponse(Call<MatchResponse> call, Response<MatchResponse> response) {
                 if (response.isSuccessful()) {
-                    Log.d(TAG, "post submitted to API." + response.body().toString());
+                    Log.d(TAG, "post submitted to API." + gson.toJson(response.body()));
                     setMatchInfoOnScreen(response.body());
                 }
             }
@@ -102,7 +102,7 @@ public class MatchActivity extends AppCompatActivity {
             public void onResponse(Call<List<VideosResponse>> call, Response<List<VideosResponse>> response) {
                 if (response.isSuccessful()) {
                     Log.d(TAG, "post submitted to API." + gson.toJson(response.body()));
-                    setVideoButtonsOnScreen(response.body());
+                    setVideoButtonsOnScreen((ArrayList<VideosResponse>) response.body());
                 }
             }
 
@@ -127,18 +127,30 @@ public class MatchActivity extends AppCompatActivity {
         score2.setText(Integer.toString(matchResponse.getTeam2().getScore()));
     }
 
-    private void setVideoButtonsOnScreen(List<VideosResponse> videos) {
-        ArrayList<VideosResponse> videosList = (ArrayList<VideosResponse>)videos;
-        LinearLayout ll = (LinearLayout)findViewById(R.id.layout_buttons);
+    private void setVideoButtonsOnScreen(ArrayList<VideosResponse> videos) {
 
-        for(int i = 0; i < videosList.size(); i++) {
-            Button videoButton = new Button(this);
-            videoButton.setText(videosList.get(i).getName());
+        final float scale = MatchActivity.this.getResources().getDisplayMetrics().density;
 
-            videoButton.setLayoutParams(new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 
+        for(VideosResponse video: videos) {
+            Button videoButton = new Button(MatchActivity.this);
+            videoButton.setText(video.getName());
+
+            videoButton.setWidth((int)(200 * scale));
+            videoButton.setHeight((int)(100 * scale));
+            videoButton.setLayoutParams(params);
+
+            videoButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(MatchActivity.this, VideoActivity.class);
+                    intent.putExtra("url", video.getUrl());
+                    Log.i(TAG, "Video Playing....");
+                    startActivity(intent);
+                }
+            });
             ll.addView(videoButton);
         }
     }
